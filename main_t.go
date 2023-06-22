@@ -76,24 +76,22 @@ func RunConcurrentTester(b *testing.B, redis RedisInterface, loadFactor float64,
 	b.ReportAllocs()
 	b.StartTimer()
 
-	allocs := GetAllocs(func() {
-		for i := 0; i < b.N; i++ {
-			for j := 0.0; j < loadFactor; j++ {
-				wg := sync.WaitGroup{}
-				wg.Add(goroutines)
-				for k := 0; k < goroutines; k++ {
-					go func(j float64) {
-						defer wg.Done()
-						if _, err := redis.Get(fmt.Sprint(j)); err != nil {
-							println(j)
-							panic(fmt.Sprintf("getting: %s", err))
-						}
-					}(j)
-				}
-				wg.Wait()
+	allocs := testing.AllocsPerRun(b.N, (func() {
+		for j := 0.0; j < loadFactor; j++ {
+			wg := sync.WaitGroup{}
+			wg.Add(goroutines)
+			for k := 0; k < goroutines; k++ {
+				go func(j float64) {
+					defer wg.Done()
+					if _, err := redis.Get(fmt.Sprint(j)); err != nil {
+						println(j)
+						panic(fmt.Sprintf("getting: %s", err))
+					}
+				}(j)
 			}
+			wg.Wait()
 		}
-	})
+	}))
 
 	_ = allocs
 	b.ReportMetric(float64(allocs), "alloc-isolated")
