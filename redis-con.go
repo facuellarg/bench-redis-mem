@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"os"
 
@@ -14,7 +15,7 @@ import (
 func GetRedisCon() (*redis.Client, error) {
 
 	redisAddress := "host.docker.internal:6379"
-	if os.Getenv("ENV") == "" {
+	if os.Getenv("ENV") != "" {
 		addr, port := memoryDB()
 		redisAddress = fmt.Sprintf("%s:%d", addr, port)
 	}
@@ -22,7 +23,12 @@ func GetRedisCon() (*redis.Client, error) {
 
 	// Create a Redis client using the go-redis library
 	client := redis.NewClient(&redis.Options{
-		Addr: redisAddress,
+		Addr:     redisAddress,
+		DB:       0,
+		Password: "",
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	})
 
 	// Ping the Redis server to check the connectivity
