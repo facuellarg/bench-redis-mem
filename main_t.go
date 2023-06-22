@@ -92,8 +92,8 @@ func RunConcurrentTester(b *testing.B, redis RedisInterface, loadFactor float64,
 							panic(fmt.Sprintf("getting: %s", err))
 						}
 					}(j)
-					wg.Wait()
 				}
+				wg.Wait()
 			}
 		}
 	})

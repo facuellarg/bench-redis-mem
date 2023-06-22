@@ -14,23 +14,22 @@ func benchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	goroutinesString := r.URL.Query().Get("goroutines")
 	loadFactor, _ = strconv.ParseFloat(loadFactorString, 64)
 	goroutines, _ = strconv.Atoi(goroutinesString)
+	w.Header().Set("Content-Type", "text/plain")
 
 	redisResult := testing.Benchmark(BenchmarkGetFromRedis)
-	memoryResult := testing.Benchmark(BenchmarkGetFromMemory)
+	w.Write([]byte("redis:\n" + redisResult.String() + "\n"))
 
-	output := []byte("redis:\n" + redisResult.String() + "\n\nmemory:\n" + memoryResult.String())
-	// os.Setenv("LOAD_FACTOR", loadFactorString)
-	// cmd := exec.Command("go", "test", "-bench=.")
-	// fmt.Printf("Running: %s\n", cmd)
-	// output, err := cmd.CombinedOutput()
-	// if err != nil {
-	// 	http.Error(w, fmt.Sprintf("Failed to run benchmark: %s", err), http.StatusInternalServerError)
-	// 	return
-	// }
+	memoryResult := testing.Benchmark(BenchmarkGetFromMemory)
+	w.Write([]byte("memory:\n" + memoryResult.String() + "\n"))
+
+	redisConcurrentResult := testing.Benchmark(BenchmarkGetConcurrentFromRedis)
+	w.Write([]byte("redis concurrent:\n" + redisConcurrentResult.String() + "\n"))
+	memoryConcurrentResult := testing.Benchmark(BenchmarkGetConcurrentFromMemory)
+	w.Write([]byte("memory concurrent:\n" + memoryConcurrentResult.String() + "\n"))
+	// output := []byte("redis:\n" + redisResult.String() + "\n\nmemory:\n" + memoryResult.String() + "\n\nredis concurrent:\n" + redisConcurrentResult.String() + "\n\nmemory concurrent:\n" + memoryConcurrentResult.String())
 
 	// Write the benchmark output to the response
-	w.Header().Set("Content-Type", "text/plain")
-	w.Write(output)
+	// w.Write(output)
 }
 
 func main() {
