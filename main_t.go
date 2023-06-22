@@ -60,7 +60,6 @@ func RunSerialTester(b *testing.B, redis RedisInterface, loadFactor float64) {
 		}
 	})
 
-	_ = allocs
 	b.ReportMetric(float64(allocs), "alloc-isolated")
 	b.StopTimer()
 

@@ -12,8 +12,12 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-func GetRedisCon() (*redis.Client, error) {
+var redisConSingleton *redis.Client
 
+func GetRedisCon() (*redis.Client, error) {
+	if redisConSingleton != nil {
+		return redisConSingleton, nil
+	}
 	redisAddress := "localhost:6379"
 	if os.Getenv("ENV") != "" {
 		addr, port := memoryDB()
@@ -21,8 +25,8 @@ func GetRedisCon() (*redis.Client, error) {
 	}
 	fmt.Println(redisAddress)
 
-	// Create a Redis client using the go-redis library
-	client := redis.NewClient(&redis.Options{
+	// Create a Redis redisConSingleton using the go-redis library
+	redisConSingleton = redis.NewClient(&redis.Options{
 		Addr:     redisAddress,
 		DB:       0,
 		Password: "",
@@ -32,12 +36,12 @@ func GetRedisCon() (*redis.Client, error) {
 	})
 
 	// Ping the Redis server to check the connectivity
-	_, err := client.Ping(client.Context()).Result()
+	_, err := redisConSingleton.Ping(redisConSingleton.Context()).Result()
 	if err != nil {
 		return nil, err
 	}
 
-	return client, nil
+	return redisConSingleton, nil
 }
 
 func memoryDB() (string, int64) {
