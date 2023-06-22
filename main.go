@@ -3,13 +3,17 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"testing"
 )
 
 func benchmarkHandler(w http.ResponseWriter, r *http.Request) {
 	// Run the benchmark command
 
-	// loadFactorString := r.URL.Query().Get("load-factor")
+	loadFactorString := r.URL.Query().Get("load-factor")
+	goroutinesString := r.URL.Query().Get("goroutines")
+	loadFactor, _ = strconv.ParseFloat(loadFactorString, 64)
+	goroutines, _ = strconv.Atoi(goroutinesString)
 
 	redisResult := testing.Benchmark(BenchmarkGetFromRedis)
 	memoryResult := testing.Benchmark(BenchmarkGetFromMemory)

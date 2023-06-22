@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"os"
 
@@ -25,9 +26,9 @@ func GetRedisCon() (*redis.Client, error) {
 		Addr:     redisAddress,
 		DB:       0,
 		Password: "",
-		// TLSConfig: &tls.Config{
-		// 	InsecureSkipVerify: false,
-		// },
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify: false,
+		},
 	})
 
 	// Ping the Redis server to check the connectivity
