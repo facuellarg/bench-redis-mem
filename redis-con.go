@@ -64,7 +64,6 @@ func memoryDB() (string, int64) {
 		Config: aws.Config{
 			Region: aws.String("us-east-1"),
 		},
-		Profile: "personal",
 	})
 	if err != nil {
 
