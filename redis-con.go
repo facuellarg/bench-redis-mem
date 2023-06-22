@@ -26,8 +26,7 @@ func GetRedisCon() (*redis.ClusterClient, error) {
 	fmt.Println(redisAddress)
 	clusterOptions := &redis.ClusterOptions{
 		Addrs: []string{
-			"redis-test-0001-001.redis-test.psfk4a.memorydb.us-east-1.amazonaws.com:6379",
-			"redis-test-0002-001.redis-test.psfk4a.memorydb.us-east-1.amazonaws.com:6379",
+			redisAddress,
 		},
 		NewClient: func(opt *redis.Options) *redis.Client {
 			opt.DB = 0
