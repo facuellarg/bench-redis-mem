@@ -76,7 +76,7 @@ func memoryDB() (string, int64) {
 
 	// Retrieve information about your MemoryDB clusters
 	input := &memorydb.DescribeClustersInput{
-		ClusterName: aws.String("redis-test"),
+		ClusterName: aws.String("redis-test-1"),
 	}
 
 	result, err := svc.DescribeClustersWithContext(context.Background(), input)
