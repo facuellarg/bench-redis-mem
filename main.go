@@ -33,6 +33,7 @@ func benchmarkHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// memoryDB()
 	http.HandleFunc("/benchmark", benchmarkHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

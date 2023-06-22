@@ -7,10 +7,10 @@ import (
 )
 
 type Redis struct {
-	client *redis.Client
+	client *redis.ClusterClient
 }
 
-func NewRedis(client *redis.Client) *Redis {
+func NewRedis(client *redis.ClusterClient) *Redis {
 	return &Redis{client: client}
 }
 

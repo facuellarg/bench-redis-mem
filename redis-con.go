@@ -12,9 +12,9 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-var redisConSingleton *redis.Client
+var redisConSingleton *redis.ClusterClient
 
-func GetRedisCon() (*redis.Client, error) {
+func GetRedisCon() (*redis.ClusterClient, error) {
 	if redisConSingleton != nil {
 		return redisConSingleton, nil
 	}
@@ -24,16 +24,24 @@ func GetRedisCon() (*redis.Client, error) {
 		redisAddress = fmt.Sprintf("%s:%d", addr, port)
 	}
 	fmt.Println(redisAddress)
-
-	// Create a Redis redisConSingleton using the go-redis library
-	redisConSingleton = redis.NewClient(&redis.Options{
-		Addr:     redisAddress,
-		DB:       0,
+	clusterOptions := &redis.ClusterOptions{
+		Addrs: []string{
+			"redis-test-0001-001.redis-test.psfk4a.memorydb.us-east-1.amazonaws.com:6379",
+			"redis-test-0002-001.redis-test.psfk4a.memorydb.us-east-1.amazonaws.com:6379",
+		},
 		Password: "",
 		TLSConfig: &tls.Config{
 			InsecureSkipVerify: false,
 		},
-	})
+	}
+
+	// Create a Redis redisConSingleton using the go-redis library
+	// redisConSingleton = redis.NewClient(&redis.Options{
+	redisConSingleton = redis.NewClusterClient(clusterOptions)
+	// TLSConfig: &tls.Config{
+	// 	InsecureSkipVerify: false,
+	// },
+	// })
 
 	// Ping the Redis server to check the connectivity
 	_, err := redisConSingleton.Ping(redisConSingleton.Context()).Result()
@@ -50,6 +58,7 @@ func memoryDB() (string, int64) {
 		Config: aws.Config{
 			Region: aws.String("us-east-1"),
 		},
+		Profile: "personal",
 	})
 	if err != nil {
 
@@ -71,6 +80,7 @@ func memoryDB() (string, int64) {
 		return "", 0
 	}
 
+	fmt.Printf("result: %v\n", result)
 	// Access cluster details from the result variable
 	for _, cluster := range result.Clusters {
 		fmt.Println("Cluster name", *cluster.Name)
